@@ -1,0 +1,21 @@
+curl -X POST -H "Content-Type: application/json" -d '{
+  "setting_type" : "call_to_actions",
+  "thread_state" : "existing_thread",
+  "call_to_actions":[
+    {
+      "type":"postback",
+      "title":"Menu",
+      "payload":"menu"
+    },
+    {
+      "type":"postback",
+      "title":"Schedule",
+      "payload":"view_schedule"
+    },
+    {
+      "type":"postback",
+      "title":"Map",
+      "payload":"view_map"
+    }
+  ]
+}' "https://graph.facebook.com/v2.6/me/thread_settings?access_token=EAAVqnKO5uToBAB3rEB4Yj7j5uFWAFEMtBWNdQqrbRi74lgslUUWpWfzznmgQSblzPfunfx9fQlLCwJ693vK7nGeCn1lpokL6Igy2lLcSsZBCF3WxuZAwzNZAnSZAlHePZAp9gisOhjmO3YCoIP0YQA0aqqsqKAFK2zo8J9ipy9QZDZD"
