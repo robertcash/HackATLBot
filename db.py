@@ -1,6 +1,6 @@
 from peewee import *
 
-database = MySQLDatabase('hackatldb', **{'host': 'hackatl2016.ckjhyw4u4b3p.us-east-1.rds.amazonaws.com', 'password': '', 'port': 3306, 'user': 'hackatl'})
+database = MySQLDatabase('', **{'host': '', 'password': '', 'port': 3306, 'user': ''})
 
 class UnknownField(object):
     pass
@@ -40,12 +40,12 @@ class Team(BaseModel):
         db_table = 'Team'
 
 class Project(BaseModel):
-    proj_id = PrimaryKeyField(db_column='sub_id')
+    proj_id = PrimaryKeyField(db_column='proj_id')
     url = CharField(db_column='url', null=True)
-    project_user_id = IntegerField(db_column='sub_user_id', null=True)
-    project_team_id = IntegerField(db_column='sub_team_id', null=True)
+    project_user_id = IntegerField(db_column='project_user_id', null=True)
+    project_team_id = IntegerField(db_column='project_team_id', null=True)
     status = CharField(db_column='status', null=True)
     assignment = CharField(db_column='assignment', null=True)
 
     class Meta:
-        db_table = 'Submission'
+        db_table = 'Project'

@@ -4,6 +4,7 @@ from helpers import send_response
 from peewee import *
 from receive import Receiver
 import json
+import bot_messages
 import bot_new_user_flow
 import bot_project_flow
 import bot_team_flow
@@ -17,7 +18,7 @@ def get_user(sender_messenger_id):
         return user
 
 def parser(receiver, user):
-    if receiver.get_request_type() == 'messsage' and receiver.get_message_type() == 'message':
+    if receiver.get_request_type() == 'message' and receiver.get_message_type() == 'message':
         text = receiver.get_text().lower()
         if 'help' in text or 'menu' in text:
             return bot_messages.menu_message(user)
@@ -25,17 +26,19 @@ def parser(receiver, user):
             return bot_messages.schedule_message(user)
         elif 'where' in text or 'map' in text:
             return bot_messages.map_message(user)
-        elif 'project' in text or 'submit' in text:
+        elif 'project' in text or 'submit' in text or 'results' in text:
             return bot_project_flow.request_handler(receiver, user)
         elif 'team' in text:
             return bot_team_flow.request_handler(receiver, user)
+        elif 'hi' in text or 'hey' in text or 'hello' in text or 'yo' in text:
+            return bot_messages.greeting_message(user)
         else:
             bot_messages.generic_error_message(user, False)
             return bot_messages.menu_message(user)
     else:
         return send_response()
 
-def payload_parser(payload_user, user):
+def payload_parser(payload, user):
     if payload == 'menu':
         return bot_messages.menu_message(user)
     elif payload == 'view_schedule':
@@ -43,13 +46,13 @@ def payload_parser(payload_user, user):
     elif payload == 'view_map':
         return bot_messages.map_message(user)
 
-def qr_payload_parser(payload, user):
+def qr_payload_parser(payload, receiver, user):
     if payload == 'view_schedule':
-        return bot_message.schedule_message(user)
+        return bot_messages.schedule_message(user)
     elif payload == 'view_map':
-        return bot_message.map_message(user)
+        return bot_messages.map_message(user)
     elif payload == 'menu':
-        return bot_message.menu_message(user)
+        return bot_messages.menu_message(user)
     elif 'team' in payload:
         return bot_team_flow.request_handler(receiver, user)
     elif 'project' in payload:
@@ -69,17 +72,18 @@ def response_handler(request):
             return payload_parser(payload, user)
         elif receiver.get_request_type() == 'message' and receiver.get_message_type() == 'quick_reply':
             qr_payload = receiver.get_quick_reply_payload()
-            return qr_payload_parser(qr_payload, user)
+            return qr_payload_parser(qr_payload, receiver, user)
 
         # Check states for message requests
         if user.new_user:
             return bot_new_user_flow.request_handler(receiver, user)
-        elif user.state == 'team_code_waiting':
-            return bot_team_flow.response_handler(receiver, user)
         elif user.state == 'open':
             return parser(receiver, user)
-
+        elif user.state == 'team_code_waiting':
+            return bot_team_flow.request_handler(receiver, user)
+        elif user.state == 'submission_waiting':
+            return bot_project_flow.request_handler(receiver, user)
         return bot_messages.generic_error_message(user)
 
     except:
-        return bot_messages.generic_error_message(user)
+        return send_response()

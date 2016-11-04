@@ -14,12 +14,12 @@ def email_handler(text, user):
         user.new_user = False
         user.state = 'open'
         user.save()
-        return bot_message.menu_message(user)
+        return bot_messages.menu_message(user)
     except:
-        return bot_message.email_failure_message(user)
+        return bot_messages.email_failure_message(user)
 
 def message_handler(receiver, user):
-    text = receiver.get_text()
+    text = receiver.get_text().lower()
     state = user.state
     if state == 'sign_up':
         return bot_messages.welcome_message(user)

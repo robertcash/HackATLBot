@@ -210,13 +210,21 @@ class GenericTemplateElement():
         self.buttons = []
         for button in buttons:
             self.buttons.append(button.request_json)
-        self.request_json = {
-            'title':self.title,
-            'item_url':self.item_url,
-            'image_url':self.image_url,
-            'subtitle':self.subtitle,
-            'buttons':self.buttons
-        }
+        if len(self.buttons) > 0:
+            self.request_json = {
+                'title':self.title,
+                'item_url':self.item_url,
+                'image_url':self.image_url,
+                'subtitle':self.subtitle,
+                'buttons':self.buttons
+            }
+        else:
+            self.request_json = {
+                'title':self.title,
+                'item_url':self.item_url,
+                'image_url':self.image_url,
+                'subtitle':self.subtitle
+            }
 
 class QuickReply():
     def __init__(self, content_type, title='', payload='', image_url=''):

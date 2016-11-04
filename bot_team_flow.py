@@ -13,8 +13,11 @@ def view_team_handler(user):
     return bot_postbacks.view_team_postback(data, user)
 
 def create_team_handler(user):
-    code = str(uuid.uuid4())
-    team = Team.create(code=code, team_leader_id=user.user_id)
+    team = Team.create(team_leader_id=user.user_id)
+    u = str(uuid.uuid4())
+    code = str(team.team_id) + u[0: 4]
+    team.code = code
+    team.save()
     user.team_id = team.team_id
     user.save()
     data = {'code_card':team,'team_member_cards':[]}
@@ -23,13 +26,18 @@ def create_team_handler(user):
 def team_code_handler(receiver, user):
     text = receiver.get_text()
     team_query = Team.select().where(Team.code == text)
+
     if len(team_query) > 0:
         team = team_query[0]
+        members = User.select().where(User.team_id == team.team_id)
+        if len(members) == 6:
+            # Team full
+            return bot_messages.team_full_message(user)
         user.team_id = team.team_id
         user.save()
-        return team_code_ask_success_message(team.team_id, user)
+        return bot_messages.team_code_ask_success_message(team.team_id, user)
 
-    return team_code_ask_failure_message(user)
+    return bot_messages.team_code_ask_failure_message(user)
 
 
 def quick_reply_handler(receiver, user):

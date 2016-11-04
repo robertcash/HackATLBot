@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, g, Response, render_template
 from peewee import *
 import bot
 import db
+import os
 import reminder_system
 
 # Elastic Beanstalk initalization
@@ -47,4 +48,6 @@ def webhook():
         return bot.response_handler(request.get_json())
 
 if __name__ == '__main__':
-    application.run(host='0.0.0.0',port = 8080, debug = True)
+    application.debug = True
+    port = int(os.environ.get("PORT", 5000))
+    application.run(host='0.0.0.0',port = port, debug = True)
